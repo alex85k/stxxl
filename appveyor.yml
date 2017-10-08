@@ -1,0 +1,37 @@
+version: 1.4.99.{build}
+
+os: Visual Studio 2017
+
+platform: x64
+
+configuration: Release
+
+shallow_clone: true
+clone_depth: 1
+
+matrix:
+  fast_finish: false # set this flag to immediately finish build once one of the jobs fails.
+
+environment:
+  matrix:
+    - PLATFORM: x64
+      GENERATOR: "Visual Studio 14 2015 Win64"
+    - PLATFORM: x64
+      GENERATOR: "Visual Studio 15 2017 Win64"
+
+init:
+  - ps: 'Write-Host "Building STXXL branch: $env:APPVEYOR_REPO_BRANCH" -ForegroundColor Magenta'
+
+before_build:
+  - ps: 'Write-Host "Running $env:BUILDER with $env:GENERATOR" -ForegroundColor Magenta'
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - mkdir build && cd build
+  - cmake.exe .. -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DBUILD_TESTS=ON
+
+build_script:
+  - ps: 'Write-Host "Running $env:BUILDER:" -ForegroundColor Magenta'
+  - msbuild stxxl.sln /p:Configuration=%CONFIGURATION% /p:Platform=%PLATFORM% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll
+
+test_script:
+  - ps: 'Write-Host "Running tests:" -ForegroundColor Magenta'
+  - ctest -V --output-on-failure -C %CONFIGURATION%

@@ -15,8 +15,8 @@
 
 #include <stxxl/bits/config.h>
 
-#if STXXL_MSVC
-
+//vs2015 already the needed functions
+#if STXXL_MSVC && _MSC_VER < 1900
 #include <cmath>
 
 inline double log2(double x)
@@ -37,3 +37,4 @@ inline double log2(double x)
 
 #endif // !STXXL_MSVC_COMPATIBILITY_HEADER
 // vim: et:ts=4:sw=4
+
